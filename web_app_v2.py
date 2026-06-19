@@ -442,18 +442,33 @@ def render_continuous_beam() -> None:
             with t1:
                 df_pl = st.session_state.setdefault(
                     f"cb_pl_{i}", pd.DataFrame(columns=["P (kN)", "x_local (m)"]))
-                df_pl = st.data_editor(df_pl, key=f"cb_pl_ed_{i}", **cfg)
-                st.session_state[f"cb_pl_{i}"] = df_pl
+                st.data_editor(
+                    st.session_state[f"cb_pl_{i}"],
+                    key=f"cb_pl_ed_{i}",
+                    **cfg
+                )
+
+                df_pl = st.session_state[f"cb_pl_{i}"]
             with t2:
                 df_udl = st.session_state.setdefault(
                     f"cb_udl_{i}", pd.DataFrame(columns=["q (kN/m)", "x1_local (m)", "x2_local (m)"]))
-                df_udl = st.data_editor(df_udl, key=f"cb_udl_ed_{i}", **cfg)
-                st.session_state[f"cb_udl_{i}"] = df_udl
+                st.data_editor(
+                    st.session_state[f"cb_udl_{i}"],
+                    key=f"cb_udl_ed_{i}",
+                    **cfg
+                )
+
+                df_udl = st.session_state[f"cb_udl_{i}"]
             with t3:
                 df_pm = st.session_state.setdefault(
                     f"cb_pm_{i}", pd.DataFrame(columns=["M (kNm)", "x_local (m)"]))
-                df_pm = st.data_editor(df_pm, key=f"cb_pm_ed_{i}", **cfg)
-                st.session_state[f"cb_pm_{i}"] = df_pm
+                st.data_editor(
+                    st.session_state[f"cb_pm_{i}"],
+                    key=f"cb_pm_ed_{i}",
+                    **cfg
+                )
+
+                df_pm = st.session_state[f"cb_pm_{i}"]
 
             span_pl.append(clean_rows(df_pl,  ["P (kN)", "x_local (m)"]))
             span_udl.append(clean_rows(df_udl, ["q (kN/m)", "x1_local (m)", "x2_local (m)"]))
@@ -686,8 +701,13 @@ def render_plane_frame() -> None:
                                       "Fy (kN)": pd.Series(dtype=float),
                                       "Mz (kNm)": pd.Series(dtype=float)})
         df_nload = st.session_state.setdefault("pf_nloads", df_nload_def)
-        df_nload = st.data_editor(df_nload, key="pf_nl_ed", **cfg)
-        st.session_state["pf_nloads"] = df_nload
+        st.data_editor(
+            st.session_state["pf_nloads"],
+            key="pf_nl_ed",
+            **cfg
+        )
+
+        df_nload = st.session_state["pf_nloads"]
 
     with tab_udl_el:
         st.caption("UDL phân bố trên phần tử (nhập vào cột 'udl_local' trong bảng Elements)")
@@ -721,12 +741,12 @@ def render_plane_frame() -> None:
             pls = []
             for _, r in df_nload.iterrows():
                 if pd.isna(r.get("node")): continue
-                pls.append(FramePointLoad(
-                    node=int(r["node"]),
-                    Fx=float(r.get("Fx (kN)", 0) or 0),
-                    Fy=float(r.get("Fy (kN)", 0) or 0),
-                    Mz=float(r.get("Mz (kNm)", 0) or 0),
-                ))
+                FramePointLoad(
+                    node=int(row["node"]),
+                    Fx=float(row["Fx (kN)"]),
+                    Fy=float(row["Fy (kN)"]),
+                    Mz=float(row["Mz (kNm)"])
+                )
             pf_input = PlaneFrameInput(nodes=nodes, elements=elems, supports=sups, point_loads=pls)
             result_pf = solve_plane_frame(pf_input)
             st.session_state.pf_result = result_pf
